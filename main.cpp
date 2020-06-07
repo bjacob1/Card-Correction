@@ -16,7 +16,6 @@ int main()
     for(Point2f &corner : corners)
         circle(img, corner, 5, Scalar(0, 0, 255), -1);
     imshow("Image", blurred);
-    cout << "FFFF" << endl;
     waitKey(0);
     return 0;
 }
