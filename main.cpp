@@ -37,19 +37,25 @@ int main()
 //        circle(img, corner, 5, Scalar(0, 0, 255), -1);
     //find and draw contours of image
     vector<vector<Point>> contours;
-    findContours(canny, contours, noArray(), RETR_CCOMP, CHAIN_APPROX_SIMPLE);
+    findContours(canny, contours, noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 //    drawContours(img, contours, -1, Scalar(0, 0, 255), -1, 8);
-    vector<vector<Point>> test;
-    test.emplace_back(contours.at(0));
-    test.emplace_back(contours.at(1));
-    drawContours(img, test, -1, Scalar(0, 0, 255), -1, 8);
-    RotatedRect rec = minAreaRect(contours.at(largest_contour(contours)));
-    vector<Point2f> corners(4);
-    rec.points(corners.data());
-//    vector<Point> corners;
+    int largest_ind = largest_contour(contours);
+    RotatedRect rec = minAreaRect(contours.at(largest_ind));
+//    vector<Point2f> corners(4);
+//    rec.points(corners.data());
+    vector<vector<Point>> draw;
+    draw.emplace_back(contours.at(largest_ind));
+    drawContours(img, draw, -1, Scalar(0, 0, 255), 2, 8);
+//    vector<Point> corners
 //    boxPoints(rec, corners);
-    for(int i = 0; i < corners.size(); i++) {
-        circle(img, corners.at(i), 5, Scalar(0, 0, 255), -1);
+//    for(int i = 0; i < corners.size(); i++) {
+//        circle(img, corners.at(i), 5, Scalar(0, 0, 255), -1);
+//    }
+
+    vector<Point> pts(4);
+    approxPolyDP(draw[0], pts, 5, true);
+    for(int i = 0; i < pts.size(); i++) {
+        circle(img, pts.at(i), 5, Scalar(0, 0, 255), -1);
     }
     //display image
     imshow("Image", img);
