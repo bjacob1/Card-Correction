@@ -30,19 +30,12 @@ int main()
     //apply canny edge detection to image
     Mat canny;
     Canny(blurred, canny, 60, 150);
-//    vector<Point2f> corners;
-//    goodFeaturesToTrack(blurred, corners, 100, 0.05, 10, noArray(), 3, true);
-////    cornerHarris(blurred, img, 2, 2, 0.04);
-//    for(Point2f &corner : corners)
-//        circle(img, corner, 5, Scalar(0, 0, 255), -1);
-    //find and draw contours of image
+    //find contours of image
     vector<vector<Point>> contours;
     findContours(canny, contours, noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-//    drawContours(img, contours, -1, Scalar(0, 0, 255), -1, 8);
+    //find largest contour in image
     int largest_ind = largest_contour(contours);
     RotatedRect rec = minAreaRect(contours.at(largest_ind));
-//    vector<Point2f> corners(4);
-//    rec.points(corners.data());
     vector<vector<Point>> draw;
     draw.emplace_back(contours.at(largest_ind));
 //    drawContours(img, draw, -1, Scalar(0, 0, 255), 2, 8);
@@ -51,7 +44,8 @@ int main()
 //    for(int i = 0; i < corners.size(); i++) {
 //        circle(img, corners.at(i), 5, Scalar(0, 0, 255), -1);
 //    }
-
+    double ratio = rec.size.height / rec.size.width;
+    cout << ratio << endl;
     vector<Point2f> pts;
     int epsilon = 0;
     while(pts.size() != 4) {
@@ -66,12 +60,14 @@ int main()
 //        circle(img, pts.at(i), 5, Scalar(0, 0, 255), -1);
 //    }
     vector<Point2f> world_coors;
+    int height = 1000 * ratio;
+    cout << height << endl;
     world_coors.emplace_back(Point2f(0, 0));
-    world_coors.emplace_back(Point2f(0, 350));
-    world_coors.emplace_back(Point2f(500, 350));
-    world_coors.emplace_back(Point2f(500, 0));
+    world_coors.emplace_back(Point2f(0, height));
+    world_coors.emplace_back(Point2f(1000, height));
+    world_coors.emplace_back(Point2f(1000, 0));
     Mat trans_mat = getPerspectiveTransform(pts, world_coors);
-    Mat result = Mat(Size(500, 350), CV_64F);
+    Mat result = Mat(Size(1000, height), CV_64F);
     warpPerspective(img, result, trans_mat, result.size());
 //    perspectiveTransform(pts, result, trans_mat);
     //display image
