@@ -45,20 +45,37 @@ int main()
 //    rec.points(corners.data());
     vector<vector<Point>> draw;
     draw.emplace_back(contours.at(largest_ind));
-    drawContours(img, draw, -1, Scalar(0, 0, 255), 2, 8);
+//    drawContours(img, draw, -1, Scalar(0, 0, 255), 2, 8);
 //    vector<Point> corners
 //    boxPoints(rec, corners);
 //    for(int i = 0; i < corners.size(); i++) {
 //        circle(img, corners.at(i), 5, Scalar(0, 0, 255), -1);
 //    }
 
-    vector<Point> pts(4);
-    approxPolyDP(draw[0], pts, 5, true);
-    for(int i = 0; i < pts.size(); i++) {
-        circle(img, pts.at(i), 5, Scalar(0, 0, 255), -1);
+    vector<Point2f> pts;
+    int epsilon = 0;
+    while(pts.size() != 4) {
+        epsilon++;
+        approxPolyDP(draw[0], pts, epsilon, true);
     }
+//    circle(img, pts.at(0), 5, Scalar(255, 0, 0), -1); //blue
+//    circle(img, pts.at(1), 5, Scalar(0, 255, 0), -1); //green
+//    circle(img, pts.at(2), 5, Scalar(0, 0, 255), -1); //red
+//    circle(img, pts.at(3), 5, Scalar(0, 0, 0), -1); //black
+    //    for(int i = 0; i < pts.size(); i++) {
+//        circle(img, pts.at(i), 5, Scalar(0, 0, 255), -1);
+//    }
+    vector<Point2f> world_coors;
+    world_coors.emplace_back(Point2f(0, 0));
+    world_coors.emplace_back(Point2f(0, 350));
+    world_coors.emplace_back(Point2f(500, 350));
+    world_coors.emplace_back(Point2f(500, 0));
+    Mat trans_mat = getPerspectiveTransform(pts, world_coors);
+    Mat result = Mat(Size(500, 350), CV_64F);
+    warpPerspective(img, result, trans_mat, result.size());
+//    perspectiveTransform(pts, result, trans_mat);
     //display image
-    imshow("Image", img);
+    imshow("Image", result);
     waitKey(0);
     return 0;
 }
