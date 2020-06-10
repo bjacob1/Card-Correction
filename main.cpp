@@ -22,9 +22,21 @@ int main() {
     Mat frame;
     while(true) {
         cam >> frame;
-
+        Mat gray;
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+//        blur image
+        Mat blurred;
+        bilateralFilter(gray, blurred, 5, 75, 75);
+//        apply canny edge detection to image
+        Mat canny;
+        Canny(blurred, canny, 60, 150);
+        //find contours of image
+        vector<vector<Point>> contours;
+        findContours(canny, contours, noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+        drawContours(frame, contours, -1, Scalar(0, 0, 0), 1, 8);
         imshow("Stream", frame);
-        if(waitKey(0) == 27)
+//        sleep(1);
+        if(waitKey(30) == 27)
             break;
     }
     return 0;
